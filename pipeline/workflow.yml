@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/argoproj/argo-workflows/master/api/jsonschema/schema.json
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: app-1-pipeline
+  namespace: ci-cd
+spec:
+  entrypoint: main
+  volumes:
+    - name: app
+      emptyDir: {}
+  templates:
+    - name: main
+      steps:
+        - - name: build
+            template: build
+        - - name: test
+            template: test
+          - name: publish
+            template: publish
+
+    - name: build
+      script:
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        command: [ ash ]
+        source: |-
+          dotnet build "/mnt/wf/volumes/app/code/App1/App1.csproj" \
+            --configuration Release \
+            --no-self-contained
+
+    - name: test
+      outputs:
+        artifacts:
+          - name: test
+            from: /mnt/wf/outputs/test
+      script:
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        command: [ ash ]
+        source: |-
+          dotnet test "/mnt/wf/volumes/app/code/App1.Tests/App1.Tests.csproj" \
+            --no-build \
+            --configuration Release \
+            --results-directory "/mnt/wf/outputs/test"
+
+    - name: publish
+      outputs:
+        artifacts:
+          - name: publish
+            from: /mnt/wf/outputs/publish
+      script:
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        command: [ ash ]
+        source: |-
+          dotnet publish "/mnt/wf/volumes/app/code/App1/App1.csproj" \
+            --no-build \
+            --configuration Release \
+            --no-self-contained \
+            --output "/mnt/wf/outputs/publish"
