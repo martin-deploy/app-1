@@ -1,0 +1,6 @@
+{
+  "name": "deployment-app-1",
+  "version": "0.1.0",
+  "description": "Deployment package for App 1",
+  "main": "main.ts"
+}

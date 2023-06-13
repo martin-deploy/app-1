@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: app-1-pipeline
+  name: workflow-app-1
   namespace: ci-cd
 spec:
   entrypoint: main
@@ -24,7 +24,7 @@ spec:
         image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
         command: [ ash ]
         source: |-
-          dotnet build "/mnt/wf/volumes/app/code/App1/App1.csproj" \
+          dotnet build "/mnt/wf/volumes/app/code" \
             --configuration Release \
             --no-self-contained
 
@@ -37,7 +37,7 @@ spec:
         image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
         command: [ ash ]
         source: |-
-          dotnet test "/mnt/wf/volumes/app/code/App1.Tests/App1.Tests.csproj" \
+          dotnet test "/mnt/wf/volumes/app/code" \
             --no-build \
             --configuration Release \
             --results-directory "/mnt/wf/outputs/test"
@@ -51,7 +51,7 @@ spec:
         image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
         command: [ ash ]
         source: |-
-          dotnet publish "/mnt/wf/volumes/app/code/App1/App1.csproj" \
+          dotnet publish "/mnt/wf/volumes/app/code" \
             --no-build \
             --configuration Release \
             --no-self-contained \
