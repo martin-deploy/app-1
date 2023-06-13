@@ -2,8 +2,8 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: workflow-app-1
-  namespace: ci-cd
+  name: template-martin-app-1
+  namespace: argo-workflows
 spec:
   entrypoint: main
   volumes:
