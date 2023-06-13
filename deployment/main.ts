@@ -4,7 +4,8 @@ let resources = [] as object[]
 
 resources.push(configMap("hello", {
 	hello: "martin",
-	fromApp: "1"
+	fromApp: "1",
+	templater: "on"
 }))
 
 // @ts-ignore
