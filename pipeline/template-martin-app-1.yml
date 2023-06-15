@@ -5,6 +5,8 @@ metadata:
   name: template-martin-app-1
   namespace: argo-workflows
 spec:
+  imagePullSecrets:
+    - name: martin-auth-ghcr
   volumes:
     - name: app
       emptyDir: {}
