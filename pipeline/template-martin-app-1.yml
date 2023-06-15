@@ -59,7 +59,7 @@ spec:
       outputs:
         artifacts:
           - name: test
-            from: /mnt/wf/outputs/test
+            path: /mnt/wf/outputs/test
             archive:
               none: {}
       script:
