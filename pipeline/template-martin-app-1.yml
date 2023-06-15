@@ -5,58 +5,112 @@ metadata:
   name: template-martin-app-1
   namespace: argo-workflows
 spec:
-  entrypoint: main
   volumes:
     - name: app
       emptyDir: {}
   templates:
     - name: main
+      inputs:
+        parameters:
+          - { name: branch,       default: master }
+          - { name: imageVersion, default: latest }
+          - { name: appVersion,   default: latest }
       steps:
         - - name: build
             template: build
+            arguments:
+              artifacts:
+                - name: sourceCode
+                  path: /mnt/wf/volumes/app
+                  git:
+                    repo: https://github.com/martin-deploy/app-1
+                    singleBranch: true
+                    branch: '{{inputs.parameters.branch}}'
+                    revision: '{{inputs.parameters.branch}}'
+                    depth: 1
         - - name: test
             template: test
           - name: publish
             template: publish
+        - - name: containerize
+            template: containerize
+            arguments:
+              parameters:
+                - { name: imageVersion, value: '{{inputs.parameters.imageVersion}}' }
+                - { name: appVersion,   value: '{{inputs.parameters.appVersion}}' }
 
     - name: build
+      inputs:
+        artifacts:
+          - name: sourceCode
+            path: /mnt/wf/volumes/app
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet build "/mnt/wf/volumes/app/code" \
             --configuration Release \
             --no-self-contained
+        volumeMounts:
+          - mountPath: /mnt/wf/volumes/app
+            name: app
 
     - name: test
       outputs:
         artifacts:
           - name: test
             from: /mnt/wf/outputs/test
+            archive:
+              none: {}
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet test "/mnt/wf/volumes/app/code" \
             --no-build \
             --configuration Release \
             --results-directory "/mnt/wf/outputs/test"
+        volumeMounts:
+          - mountPath: /mnt/wf/volumes/app
+            name: app
 
     - name: publish
-      outputs:
-        artifacts:
-          - name: publish
-            from: /mnt/wf/outputs/publish
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.1.0
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet publish "/mnt/wf/volumes/app/code" \
             --no-build \
             --configuration Release \
             --no-self-contained \
-            --output "/mnt/wf/outputs/publish"
+            --output "/mnt/wf/volumes/app/publish"
+        volumeMounts:
+          - mountPath: /mnt/wf/volumes/app
+            name: app
 
-# --label org.opencontainers.image.source=https://github.com/martin-deploy/app-1
-# --label org.opencontainers.image.version=version of the packaged software
-# --label org.opencontainers.image.created=date and time on which the image was built, conforming to RFC 3339. // https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
+    - name: containerize
+      inputs:
+        parameters:
+          - { name: imageVersion, default: latest }
+          - { name: appVersion,   default: latest }
+      volumes:
+        - name: kaniko-config
+          secret:
+            secretName: martin-auth-ghcr
+      container:
+        image: gcr.io/kaniko-project/executor:v1.11.0
+        args:
+          - --destination=ghcr.io/martin-deploy/martin-alpine-app-1:{{inputs.parameters.imageVersion}}
+          - --context=/mnt/wf/volumes/app
+          - --dockerfile=dockerfile/Dockerfile.martin-alpine-app-1
+          - --single-snapshot
+          - --build-arg=app_files=publish
+          - --label=org.opencontainers.image.version={{inputs.parameters.appVersion}}
+          - --label=org.opencontainers.image.source=https://github.com/martin-deploy/app-1
+          - --label=org.opencontainers.image.created={{workflow.creationTimestamp.RFC3339}}
+        volumeMounts:
+          - mountPath: /kaniko/.docker/config.json
+            name: kaniko-config
+            subPath: .dockerconfigjson
+          - mountPath: /mnt/wf/volumes/app
+            name: app
