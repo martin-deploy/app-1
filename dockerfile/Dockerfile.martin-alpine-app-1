@@ -1,1 +1,11 @@
 FROM ghcr.io/martin-deploy/martin-alpine-dotnet-runtime-web:0.2.0
+
+# Path to a directory containing the published application, as per `dotnet publish --output`.
+# It contains the `App1.dll` file.
+ARG app_files
+
+RUN adduser -D dotnet dotnet
+COPY --chown=dotnet:dotnet $app_files /home/dotnet/app
+
+USER dotnet
+CMD [ dotnet, /home/dotnet/app/App1.dll ]
