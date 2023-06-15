@@ -16,18 +16,19 @@ spec:
           - { name: imageVersion, default: latest }
           - { name: appVersion,   default: latest }
       steps:
-        - - name: build
-            template: build
+        - - name: checkout
+            template: checkout
             arguments:
               artifacts:
                 - name: sourceCode
-                  path: /mnt/wf/volumes/app
                   git:
                     repo: https://github.com/martin-deploy/app-1
                     singleBranch: true
                     branch: '{{inputs.parameters.branch}}'
                     revision: '{{inputs.parameters.branch}}'
                     depth: 1
+        - - name: build
+            template: build
         - - name: test
             template: test
           - name: publish
@@ -39,11 +40,21 @@ spec:
                 - { name: imageVersion, value: '{{inputs.parameters.imageVersion}}' }
                 - { name: appVersion,   value: '{{inputs.parameters.appVersion}}' }
 
-    - name: build
+    - name: checkout
       inputs:
         artifacts:
           - name: sourceCode
-            path: /mnt/wf/volumes/app
+            path: /mnt/wf/inputs/sourceCode
+      script:
+        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
+        command: [ ash ]
+        source: |-
+          cp -r -f /mnt/wf/inputs/sourceCode /mnt/wf/volumes/app
+        volumeMounts:
+          - mountPath: /mnt/wf/volumes/app
+            name: app
+
+    - name: build
       script:
         image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
