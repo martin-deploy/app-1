@@ -7,9 +7,14 @@ metadata:
 spec:
   imagePullSecrets:
     - name: martin-auth-ghcr
-  volumes:
-    - name: app
-      emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: app
+      spec:
+        accessModes: [ ReadWriteOnce ]
+        resources:
+          requests:
+            storage: 256Mi
   templates:
     - name: main
       inputs:
@@ -51,7 +56,7 @@ spec:
         image: ghcr.io/martin-deploy/martin-alpine:0.2.0
         command: [ ash ]
         source: |-
-          cp -r -f /mnt/wf/inputs/sourceCode /mnt/wf/volumes/app
+          cp -r -f /mnt/wf/inputs/sourceCode/. /mnt/wf/volumes/app
         volumeMounts:
           - mountPath: /mnt/wf/volumes/app
             name: app
