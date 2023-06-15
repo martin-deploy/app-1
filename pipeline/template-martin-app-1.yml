@@ -46,7 +46,7 @@ spec:
           - name: sourceCode
             path: /mnt/wf/inputs/sourceCode
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
+        image: ghcr.io/martin-deploy/martin-alpine:0.2.0
         command: [ ash ]
         source: |-
           cp -r -f /mnt/wf/inputs/sourceCode /mnt/wf/volumes/app
@@ -56,7 +56,7 @@ spec:
 
     - name: build
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
+        image: ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet build "/mnt/wf/volumes/app/code" \
@@ -74,7 +74,7 @@ spec:
             archive:
               none: {}
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
+        image: ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet test "/mnt/wf/volumes/app/code" \
@@ -87,7 +87,7 @@ spec:
 
     - name: publish
       script:
-        image: https://ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
+        image: ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet publish "/mnt/wf/volumes/app/code" \
