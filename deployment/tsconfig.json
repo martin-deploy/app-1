@@ -4,6 +4,7 @@
 		"esm": true,
 		"transpileOnly": true,
 		"files": true,
+		"experimentalSpecifierResolution": "node",
 		"compilerOptions": {
 			"target": "ES2022",
 			"lib": ["ES2022"],

@@ -1,11 +1,12 @@
 import { configMap } from "./config-map"
+import { v4 as uuid } from "uuid"
 
 let resources = [] as object[]
 
 resources.push(configMap("hello", {
 	hello: "martin",
 	fromApp: "1",
-	templater: "on"
+	id: uuid()
 }))
 
 // @ts-ignore

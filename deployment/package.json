@@ -2,5 +2,11 @@
   "name": "deployment-app-1",
   "version": "0.1.0",
   "description": "Deployment package for App 1",
-  "main": "main.ts"
+  "main": "main.ts",
+  "dependencies": {
+    "uuid": "9.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "9.0.2"
+  }
 }
