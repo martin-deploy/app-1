@@ -9,7 +9,7 @@ const appSourceTargetRevisionCommitHash = process.env.ARGOCD_APP_REVISION       
 const appSourcePath                     = process.env.ARGOCD_APP_SOURCE_PATH            // "deployment"
 const appName                           = process.env.ARGOCD_APP_NAME                   // "martin-app-1"                               <- From Argo CD application's metadata.name
 const appNamespace                      = process.env.ARGOCD_APP_NAMESPACE              // "martin-prod"                                <- From Argo CD application's spec.destination.namespace
-const appParameters                     = JSON.parse(process.env.ARGOCD_APP_PARAMETERS) // "null"                                       <- From Argo CD application's spec.source.plugin (as a JSON string)
+const appParameters          = JSON.parse(process.env.ARGOCD_APP_PARAMETERS) as object  // "null"                                       <- From Argo CD application's spec.source.plugin (as a JSON string)
 
 let resources = [] as object[]
 
@@ -26,7 +26,7 @@ resources.push(configMap("hello-argo-env", {
 	appSourcePath,
 	appName,
 	appNamespace,
-	appParameters
+	appParameters: JSON.stringify(appParameters)
 }))
 
 console.log(JSON.stringify({ apiVersion: "v1", kind: "List", items: resources }, undefined, 2))
