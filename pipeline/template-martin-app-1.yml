@@ -56,3 +56,7 @@ spec:
             --configuration Release \
             --no-self-contained \
             --output "/mnt/wf/outputs/publish"
+
+# --label org.opencontainers.image.source=https://github.com/martin-deploy/app-1
+# --label org.opencontainers.image.version=version of the packaged software
+# --label org.opencontainers.image.created=date and time on which the image was built, conforming to RFC 3339. // https://datatracker.ietf.org/doc/html/rfc3339#section-5.6
