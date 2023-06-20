@@ -124,7 +124,7 @@ spec:
         image: gcr.io/kaniko-project/executor:v1.11.0
         args:
           - --destination=ghcr.io/martin-deploy/martin-alpine-app-1:{{inputs.parameters.imageVersion}}
-          - --context=/mnt/wf/volumes/app
+          - --context=dir:///mnt/wf/volumes/app
           - --dockerfile=dockerfile/Dockerfile.martin-alpine-app-1
           - --single-snapshot
           - --build-arg=app_files=publish
