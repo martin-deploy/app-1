@@ -79,20 +79,13 @@ spec:
             name: app
 
     - name: test
-      outputs:
-        artifacts:
-          - name: test
-            path: /mnt/wf/outputs/test
-            archive:
-              none: {}
       script:
         image: ghcr.io/martin-deploy/martin-alpine-dotnet-sdk:0.2.0
         command: [ ash ]
         source: |-
           dotnet test "/mnt/wf/volumes/app/code" \
             --no-build \
-            --configuration Release \
-            --results-directory "/mnt/wf/outputs/test"
+            --configuration Release
         volumeMounts:
           - mountPath: /mnt/wf/volumes/app
             name: app
