@@ -22,8 +22,9 @@ spec:
           - { name: branch,       default: master }
           - { name: imageVersion, default: latest }
           - { name: appVersion,   default: latest }
-      steps:
-        - - name: checkout
+      dag:
+        tasks:
+          - name: checkout
             template: checkout
             arguments:
               artifacts:
@@ -34,13 +35,17 @@ spec:
                     branch: '{{inputs.parameters.branch}}'
                     revision: '{{inputs.parameters.branch}}'
                     depth: 1
-        - - name: build
+          - name: build
+            dependencies: [checkout]
             template: build
-        - - name: test
+          - name: test
+            dependencies: [build]
             template: test
           - name: publish
+            dependencies: [build]
             template: publish
-        - - name: containerize
+          - name: containerize
+            dependencies: [publish] # Not depending on 'test' here: optimistic containerization
             template: containerize
             arguments:
               parameters:
