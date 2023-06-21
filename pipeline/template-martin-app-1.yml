@@ -11,10 +11,10 @@ spec:
     - metadata:
         name: app
       spec:
-        accessModes: [ ReadWriteOnce ]
+        accessModes: [ReadWriteOnce]
         resources:
           requests:
-            storage: 256Mi
+            storage: 1Gi
   templates:
     - name: main
       inputs:
